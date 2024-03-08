@@ -88,7 +88,7 @@ int main() {
     c.dropToy();
     a.getToy(d_t);
     a.dropToy();
-    
+    b.getToy(d_t);
     
  
  return 0;
