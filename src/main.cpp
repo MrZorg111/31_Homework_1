@@ -9,88 +9,70 @@ public:
     Toy (std::string _name_toy) : name_toy(_name_toy){};
     Toy(){};
 
-    void getNameToy() {
-        std::cout << name_toy << std::endl;
+    std::string getNameToy() {
+        return name_toy;
     }
     ~Toy() {
-       std::cout << "\n\nToy " << name_toy<< " was dropped " << std::endl;
-   }
-};
-class dogToy {
-    Toy* obj;
-public:
-    dogToy() {
-        obj = new Toy("Somename");
-    }
-    dogToy(std::string name) {
-        obj = new Toy(name);
-    }
-    dogToy(const dogToy& other) {
-        obj = new Toy(*other.obj);
-    }
-    dogToy& operator=(const dogToy& other) {
-        if(this == &other) {
-            return *this;
-        }
-        if(this != nullptr) {
-            delete obj;
-        }
-        obj = new Toy(*other.obj);
-        return *this;
-    }
-
-    ~dogToy() {
-        delete obj;
-    }
+       std::cout << "The toy " << name_toy<< " is removed. " << std::endl;
+   } 
 };
 
 class Dog {
     std::shared_ptr<Toy> toy_dog;
 public:
-    Dog(std::shared_ptr<Toy> _toy_dog) : toy_dog(_toy_dog) {};
-    Dog(){};
-
-    void getToy(std::shared_ptr<Toy> take_toy) {
-        if (toy_dog != nullptr) {
-            std::cout << "I already have this toy." << std::endl;
-        }
-        else if (take_toy.use_count() > 2) {
-            std::cout << "Another dog is playing with this toy." << std::endl;
-        }
-        else if (take_toy.use_count() == 2) {
-            toy_dog = take_toy;
-            std::cout << "The dog picked up the toy." << std::endl;
-        }        
-    }
-
-    void dropToy() {
-        if(toy_dog != nullptr) {
-            toy_dog = nullptr;
-            std::cout << "The dog dropped the toy." << std::endl;
+    void getToy(std::shared_ptr<Toy> _toy) {
+        if (toy_dog != _toy && (_toy.use_count() - 1) == 1) {
+            if(toy_dog != nullptr) {
+                std::cout <<"The dog dropped the toy: " << toy_dog->getNameToy() << std::endl;
+                toy_dog.reset();
+            }
+            std::cout << "The dog picked up the toy: " << _toy->getNameToy() << std::endl;
+            toy_dog = _toy;
         }
         else {
-            std::cout << "Nothing to drop." << std::endl;
+            std::cout << "Another dog is playing with this toy." << std::endl;
         }
     }
-
+    void dropToy() {
+        if (toy_dog != nullptr) {
+            std::cout <<"The dog dropped the toy: " << toy_dog->getNameToy() << std::endl;
+            toy_dog.reset();
+        }
+        else {
+            std::cout << "Nothing to drop! " << std::endl;
+        }
+    }
 };
 
 int main() {
-    std::shared_ptr<Toy> d_t = std::make_shared<Toy>("Ball");
+    std::shared_ptr<Toy> getBall = std::make_shared<Toy>("Ball");
+    std::shared_ptr<Toy> getBone = std::make_shared<Toy>("Bone");
+    std::shared_ptr<Toy> getBranch = std::make_shared<Toy>("Branch");
+    
     Dog a;
     Dog b;
     Dog c;
-
-    a.getToy(d_t);
-    b.getToy(d_t);
-    b.dropToy();
-    c.getToy(d_t);
-    c.dropToy();
-    a.getToy(d_t);
+    std::cout << "===========================================" << std::endl;
+    a.getToy(getBall);
+    a.getToy(getBone);
+    std::cout << "===========================================" << std::endl;
+    b.getToy(getBone);
+    b.getToy(getBall);
+    std::cout << "===========================================" << std::endl;
+    c.getToy(getBranch);
+    std::cout << "===========================================" << std::endl;
     a.dropToy();
-    b.getToy(d_t);
-    
- 
- return 0;
+    b.getToy(getBone);
+    std::cout << "===========================================" << std::endl;
+    a.getToy(getBall);
+    std::cout << "===========================================" << std::endl;
+    std::cout << "It's time for the dogs to eat, stop playing)" << std::endl;
+    a.dropToy();
+    b.dropToy();
+    c.dropToy();
+    std::cout << "===========================================" << std::endl;
 
+    std::cout << std::endl;
+    
+    return 0;
 }
